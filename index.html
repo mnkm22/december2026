@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>WHISPERER</title><link rel="stylesheet" href="assets/style.css"></head>
+<body class="scan"><canvas id="rain"></canvas>
+<main><h1>WHISPERER</h1><p class="tag">THE PROPHECY HAS BEGUN</p>
+<div class="win"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://TERMINAL</div>
+<div class="body"><div id="out"></div><div class="row" id="prompt"><span>guest@whisperer:~$</span><input id="in" autocomplete="off" autocapitalize="off" spellcheck="false" autofocus></div></div></div></main>
+<script src="assets/rain.js"></script>
+<script type="module">
+import {decrypt} from './assets/crypto.js';
+const out=document.getElementById('out'),inp=document.getElementById('in');
+const say=t=>{const p=document.createElement('p');p.className='line';p.textContent=t;out.appendChild(p)};
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+(async()=>{for(const l of ['> INITIALIZING SIGNAL...','> SCANNING FREQUENCIES...','> CONNECTION ESTABLISHED',"> TYPE 'BEGIN' TO CONTINUE"]){say(l);await wait(500)}})();
+document.addEventListener('click',()=>{const b=document.querySelector('.code input');(b||inp).focus()});
+window.pill=c=>{
+  if(c==='red'){sessionStorage.setItem('w','1');location.href='snake.html';return}
+  const l=document.createElement('div');l.className='loop';document.body.appendChild(l);
+  let n=0;const t=setInterval(()=>{l.textContent+='GO BACK TO SLEEP '.repeat(8);if(++n>150)clearInterval(t)},40);
+};
+inp.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;const v=inp.value.trim();inp.value='';say('guest@whisperer:~$ '+v);
+  if(v.toLowerCase()==='begin'){document.getElementById('prompt').style.display='none';say('> ENTER 6-DIGIT ACCESS CODE');boxes()}
+  else say('> UNKNOWN COMMAND');
+});
+function boxes(){
+  const row=document.createElement('div');row.className='code';
+  const bs=[...Array(6)].map(()=>{const i=document.createElement('input');i.maxLength=1;i.inputMode='numeric';i.autocomplete='off';row.appendChild(i);return i});
+  out.appendChild(row);bs[0].focus();
+  const val=()=>bs.map(b=>b.value).join('');
+  bs.forEach((b,n)=>{
+    b.addEventListener('input',()=>{b.value=b.value.replace(/\D/g,'');if(b.value&&n<5)bs[n+1].focus();if(val().length===6)check(val(),bs,row)});
+    b.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!b.value&&n>0)bs[n-1].focus()});
+    b.addEventListener('paste',e=>{const t=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);if(!t)return;e.preventDefault();[...t].forEach((d,k)=>bs[k].value=d);if(t.length===6)check(t,bs,row)});
+  });
+}
+async function check(code,bs,row){
+  const h=await decrypt(code,await (await fetch('content/pill.json')).json());
+  if(h===null){say('> ACCESS DENIED');row.classList.add('bad');setTimeout(()=>{row.classList.remove('bad');bs.forEach(b=>b.value='');bs[0].focus()},700);return}
+  document.querySelector('main').innerHTML=h;
+}
+</script></body></html>

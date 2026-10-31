@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>WHISPERER://SNAKE.EXE</title><link rel="stylesheet" href="assets/style.css"><script>if(sessionStorage.getItem("w")!=="1")location.replace("index.html")</script></head>
+<body class="scan"><canvas id="rain"></canvas>
+<main><div class="win" id="w"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SNAKE.EXE</div>
+<div class="body"><div class="row" style="justify-content:space-between"><span>SCORE <b id="s">0</b></span><span>TARGET 20</span></div>
+<canvas id="c" width="400" height="240"></canvas><p class="line" id="m">ARROWS OR SWIPE TO MOVE / EAT THE SIGNAL</p></div></div></main>
+<script src="assets/rain.js"></script>
+<script>
+const c=document.getElementById('c'),g=c.getContext('2d'),N=20,W=20,H=12,start=()=>[[5,6],[4,6],[3,6]];
+let sn=start(),dir=[1,0],nd=dir,f=[12,6],sc=0,run=1;
+const $=id=>document.getElementById(id);
+const put=()=>{do f=[Math.random()*W|0,Math.random()*H|0];while(sn.some(p=>p[0]==f[0]&&p[1]==f[1]))};
+function draw(){g.fillStyle='#010603';g.fillRect(0,0,400,240);g.fillStyle='#37ff7a';sn.forEach(p=>g.fillRect(p[0]*N+1,p[1]*N+1,N-2,N-2));g.fillStyle='#d8ffe6';g.fillRect(f[0]*N+4,f[1]*N+4,N-8,N-8)}
+function win(){run=0;$('w').classList.add('glitch');$('m').textContent='> SIGNAL OVERFLOW... THE SNAKE CONSUMES ITSELF...';
+  setTimeout(()=>{$('w').classList.remove('glitch');$('m').innerHTML='> SIGNAL CAPTURED. <a href="video.html">CONTINUE</a> (TODO: video page)'},2500)}
+function tick(){if(!run)return;dir=nd;const h=[sn[0][0]+dir[0],sn[0][1]+dir[1]];
+  if(h[0]<0||h[1]<0||h[0]>=W||h[1]>=H||sn.some(p=>p[0]==h[0]&&p[1]==h[1])){sn=start();dir=nd=[1,0];sc=0;$('s').textContent=0;put();return draw()}
+  sn.unshift(h);if(h[0]==f[0]&&h[1]==f[1]){sc++;$('s').textContent=sc;put();if(sc>=20)return win()}else sn.pop();draw()}
+addEventListener('keydown',e=>{const m={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]}[e.key];if(m&&(m[0]+dir[0]||m[1]+dir[1])){nd=m;e.preventDefault()}});
+let t0;c.addEventListener('touchstart',e=>{t0=e.touches[0]},{passive:true});
+c.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-t0.clientX,dy=t.clientY-t0.clientY,m=Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)];if(m[0]+dir[0]||m[1]+dir[1])nd=m});
+put();draw();setInterval(tick,110);
+</script></body></html>
