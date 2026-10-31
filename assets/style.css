@@ -29,3 +29,13 @@ a{color:var(--g)}
 .pill.b{color:#8ac2ff;border-color:#4da3ff;box-shadow:0 0 16px #4da3ff88}
 .loop{position:fixed;inset:0;z-index:9;background:#000;overflow:hidden;padding:1rem;line-height:1.4;word-break:break-all}
 #snd{position:fixed;top:.6rem;right:.6rem;z-index:20;font:inherit;font-size:.75rem;letter-spacing:.15em;color:var(--g);background:rgba(2,10,5,.85);border:1px solid var(--g);padding:.35rem .6rem;cursor:pointer}
+video{width:100%;max-height:60vh;background:#000;border:1px solid var(--g);display:block}
+.vid{width:min(96vw,860px)}
+body.gold{--g:#ffc94a;--bg:#0b0702}
+.portal{display:flex;flex-direction:column;align-items:center;gap:1.6rem;position:relative;z-index:2}
+.ring{width:min(60vw,260px);aspect-ratio:1;border-radius:50%;cursor:pointer;position:relative;background:radial-gradient(circle,#ffd86b 0,#b8860b 45%,#1a1100 72%);box-shadow:0 0 40px #ffc94a88,inset 0 0 40px #000;animation:pls 2s ease-in-out infinite}
+.ring::before{content:"";position:absolute;inset:-14px;border-radius:50%;background:conic-gradient(#37ff7a,#ffc94a,#37ff7a);-webkit-mask:radial-gradient(circle closest-side,transparent 88%,#000 90%);mask:radial-gradient(circle closest-side,transparent 88%,#000 90%);animation:spn 4s linear infinite}
+.ring.go{animation:none;transition:transform 1.8s cubic-bezier(.6,0,1,1);transform:scale(40)}
+@keyframes spn{to{transform:rotate(1turn)}}@keyframes pls{50%{filter:brightness(1.3)}}
+.scr{display:none}.scr.on{display:block}
+.nxt{margin-top:1rem;font:inherit;letter-spacing:.2em;color:var(--g);background:transparent;border:1px solid var(--g);padding:.5rem 1rem;cursor:pointer}

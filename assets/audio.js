@@ -24,6 +24,11 @@ window.snd={
     e.gain.setValueAtTime(.3,t);e.gain.exponentialRampToValueAtTime(.001,t+.25);
     o.connect(e);e.connect(master);o.start(t);o.stop(t+.3);
   },
+  duck(on){if(master&&!muted)master.gain.value=on?.05:.5},
+  sweep(s){if(!ctx||muted)return;const t=ctx.currentTime,o=ctx.createOscillator(),e=ctx.createGain();o.type='sawtooth';
+    o.frequency.setValueAtTime(90,t);o.frequency.exponentialRampToValueAtTime(900,t+s);
+    e.gain.setValueAtTime(.001,t);e.gain.linearRampToValueAtTime(.08,t+.3);e.gain.linearRampToValueAtTime(.0001,t+s);
+    o.connect(e);e.connect(master);o.start(t);o.stop(t+s+.1)},
   mute(m){muted=m;try{localStorage.setItem('wm',m?'1':'0')}catch{}if(master)master.gain.value=m?0:.5},
   isMuted:()=>muted
 };

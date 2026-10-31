@@ -46,8 +46,14 @@ function snake(){
   let sn=init(),dir=[1,0],nd=dir,f=[12,6],sc=0,run=1,go=0;
   const put=()=>{do f=[Math.random()*W|0,Math.random()*H|0];while(sn.some(p=>p[0]==f[0]&&p[1]==f[1]))};
   const draw=()=>{g.fillStyle='#010603';g.fillRect(0,0,400,240);g.fillStyle='#37ff7a';sn.forEach(p=>g.fillRect(p[0]*N+1,p[1]*N+1,N-2,N-2));g.fillStyle='#d8ffe6';g.fillRect(f[0]*N+4,f[1]*N+4,N-8,N-8)};
+  const ouro=done=>{const n=sn.length,R=85,cx=200,cy=120,from=sn.map(p=>[p[0]*N+N/2,p[1]*N+N/2]),t0=performance.now();
+    (function f(now){const e=Math.min(1,(now-t0)/1400),s=e*e*(3-2*e),rot=(now-t0)/900;
+      g.fillStyle='#010603';g.fillRect(0,0,400,240);
+      sn.forEach((p,i)=>{const a=rot+i/n*6.283,x=from[i][0]+(cx+R*Math.cos(a)-from[i][0])*s,y=from[i][1]+(cy+R*Math.sin(a)-from[i][1])*s;
+        g.fillStyle=i?'#37ff7a':'#d8ffe6';g.fillRect(x-9,y-9,i?18:22,i?18:22)});
+      now-t0<2800?requestAnimationFrame(f):done()})(t0)};
   const win=()=>{run=0;$('w').classList.add('glitch');$('m').textContent='> SIGNAL OVERFLOW... THE SNAKE CONSUMES ITSELF...';
-    setTimeout(()=>{$('w').classList.remove('glitch');$('m').textContent='> SIGNAL CAPTURED. (NEXT STAGE: TODO)'},2500)};
+    setTimeout(()=>{$('w').classList.remove('glitch');ouro(()=>swirl(video))},600)};
   const tick=()=>{if(!run||!go)return;dir=nd;const h=[sn[0][0]+dir[0],sn[0][1]+dir[1]];
     if(h[0]<0||h[1]<0||h[0]>=W||h[1]>=H||sn.some(p=>p[0]==h[0]&&p[1]==h[1])){sn=init();dir=nd=[1,0];sc=0;go=0;$('s').textContent=0;put();return draw()}
     sn.unshift(h);if(h[0]==f[0]&&h[1]==f[1]){sc++;$('s').textContent=sc;snd.ping();put();if(sc>=20)return win()}else sn.pop();draw()};
@@ -57,4 +63,36 @@ function snake(){
   c.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-t0.clientX,dy=t.clientY-t0.clientY;turn(Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)])});
   put();draw();setInterval(tick,110);
 }
+function swirl(done){
+  const k=document.createElement('canvas');k.width=innerWidth;k.height=innerHeight;k.style.cssText='position:fixed;inset:0;z-index:30';document.body.appendChild(k);
+  const x=k.getContext('2d'),cx=k.width/2,cy=k.height/2,R=Math.hypot(cx,cy)+40,d=30,len=Math.PI*R*R/d,ds=Math.max(2,len/150/60);
+  x.strokeStyle='#37ff7a';x.lineWidth=d+2;x.lineCap='round';snd.sweep(2.6);
+  let th=0,px=cx,py=cy;
+  (function f(){
+    x.beginPath();x.moveTo(px,py);
+    for(let i=0;i<60;i++){const r=Math.max(d*th/6.283,4);th+=Math.min(ds/r,.3);const rr=d*th/6.283;px=cx+rr*Math.cos(th);py=cy+rr*Math.sin(th);x.lineTo(px,py)}
+    x.stroke();
+    if(d*th/6.283<R)requestAnimationFrame(f);
+    else{done();k.style.transition='opacity 1s';k.style.opacity=0;setTimeout(()=>k.remove(),1100)}
+  })();
+}
+function video(){
+  document.querySelector('main').innerHTML='<div class="win vid"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SIGNAL</div><div class="body"><video id="v" controls playsinline preload="metadata" src="assets/video.mp4"></video><p class="line" id="vm">> SEVEN FLECKS CARRY A MESSAGE. ENTER WHAT YOU FOUND.</p><div class="row"><span>></span><input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ENTER WORD"></div></div></div>';
+  const v=document.getElementById('v'),a=document.getElementById('ans');
+  v.onplay=()=>snd.duck(1);v.onpause=v.onended=()=>snd.duck(0);
+  a.addEventListener('keydown',async e=>{if(e.key!=='Enter')return;const w=a.value.trim();a.value='';
+    const h=await decrypt(w,await (await fetch('content/ruins.json')).json());
+    if(h===null)document.getElementById('vm').textContent='> ACCESS DENIED';else portal(h)});
+}
+function portal(h){
+  const m=document.querySelector('main');
+  m.innerHTML='<div class="portal"><div class="ring" id="rg"></div><p class="line">> A DOOR HAS OPENED BETWEEN TWO WORLDS. STEP THROUGH.</p></div>';
+  const rg=document.getElementById('rg');
+  rg.onclick=()=>{rg.onclick=null;rg.classList.add('go');snd.sweep(2);
+    setTimeout(()=>{const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:30;background:#ffc94a;transition:opacity 1.2s';document.body.appendChild(o);
+      document.body.classList.add('gold');window.rc='#ffc94a';m.innerHTML=h;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>o.style.opacity=0));setTimeout(()=>o.remove(),1400)},1700)};
+}
+window.nxt=()=>{const a=document.querySelector('.scr.on'),n=a&&a.nextElementSibling;
+  if(n&&n.classList.contains('scr')){a.classList.remove('on');n.classList.add('on')}else document.querySelector('.nxt').style.display='none'};
 </script></body></html>
