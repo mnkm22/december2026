@@ -21,10 +21,11 @@ a{color:var(--g)}
 .code input{flex:none;width:2.6rem;height:3.2rem;text-align:center;border:1px solid var(--g);border-radius:3px;font-size:1.5rem;background:rgba(55,255,122,.06)}
 .code.bad{animation:gl .15s steps(2) 4}.code.bad input{border-color:#ff4d4d;color:#ff4d4d}
 .pillpg{width:min(96vw,860px);padding:.5rem}
-.hero{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;border:1px solid var(--g);border-radius:4px}
+.hero{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;border:1px solid var(--g);border-radius:4px}
 .say{margin:.9rem 0;text-align:left;line-height:1.6}
 .pills{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
 .pill{font:inherit;letter-spacing:.25em;padding:.9rem 2.4rem;border-radius:999px;border:2px solid;cursor:pointer;background:rgba(0,0,0,.6)}
 .pill.r{color:#ff8a8a;border-color:#ff4d4d;box-shadow:0 0 16px #ff4d4d88}
 .pill.b{color:#8ac2ff;border-color:#4da3ff;box-shadow:0 0 16px #4da3ff88}
 .loop{position:fixed;inset:0;z-index:9;background:#000;overflow:hidden;padding:1rem;line-height:1.4;word-break:break-all}
+#snd{position:fixed;top:.6rem;right:.6rem;z-index:20;font:inherit;font-size:.75rem;letter-spacing:.15em;color:var(--g);background:rgba(2,10,5,.85);border:1px solid var(--g);padding:.35rem .6rem;cursor:pointer}
