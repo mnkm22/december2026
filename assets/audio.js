@@ -29,6 +29,9 @@ window.snd={
     o.frequency.setValueAtTime(90,t);o.frequency.exponentialRampToValueAtTime(900,t+s);
     e.gain.setValueAtTime(.001,t);e.gain.linearRampToValueAtTime(.08,t+.3);e.gain.linearRampToValueAtTime(.0001,t+s);
     o.connect(e);e.connect(master);o.start(t);o.stop(t+s+.1)},
+  noise(){if(!ctx||muted)return;const t=ctx.currentTime,n=(ctx.sampleRate*.07)|0,b=ctx.createBuffer(1,n,ctx.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=Math.random()*2-1;const s=ctx.createBufferSource(),e=ctx.createGain();s.buffer=b;
+    e.gain.setValueAtTime(.15,t);e.gain.exponentialRampToValueAtTime(.001,t+.07);s.connect(e);e.connect(master);s.start(t)},
   mute(m){muted=m;try{localStorage.setItem('wm',m?'1':'0')}catch{}if(master)master.gain.value=m?0:.5},
   isMuted:()=>muted
 };

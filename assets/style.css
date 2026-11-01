@@ -39,3 +39,10 @@ body.gold{--g:#ffc94a;--bg:#0b0702}
 @keyframes spn{to{transform:rotate(1turn)}}@keyframes pls{50%{filter:brightness(1.3)}}
 .scr{display:none}.scr.on{display:block}
 .nxt{margin-top:1rem;font:inherit;letter-spacing:.2em;color:var(--g);background:transparent;border:1px solid var(--g);padding:.5rem 1rem;cursor:pointer}
+input{text-transform:uppercase}
+.stage{position:relative}
+.hot{position:absolute;width:11%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px solid;background:transparent;cursor:pointer;animation:hp 1.8s ease-in-out infinite;padding:0}
+.hot.r{border-color:#ff4d4d99;color:#ff4d4d}.hot.b{border-color:#4da3ff99;color:#4da3ff}
+.hot:hover,.hot:focus{box-shadow:0 0 24px 6px currentColor;outline:0}
+@keyframes hp{50%{box-shadow:0 0 18px 4px currentColor}}
+body.gold .win{background:rgba(14,9,3,.88)}
