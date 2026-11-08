@@ -13,7 +13,7 @@ window.startRuins=()=>{
     const w=c.width,h=c.height,cx=w/2,ly=h*.62,lrx=w*.47,lry=h*.105;
     const temple=(X,Y,S)=>{x.fillStyle='#0a0704';x.fillRect(X-S*.5,Y-S*.12,S,S*.12);x.fillRect(X-S*.4,Y-S*.42,S*.8,S*.3);
       x.beginPath();x.moveTo(X-S*.62,Y-S*.4);x.lineTo(X,Y-S);x.lineTo(X+S*.62,Y-S*.4);x.closePath();x.fill();
-      x.fillStyle='rgba(255,170,60,'+(.6+.4*Math.sin(t/160+X))+')';x.fillRect(X-S*.07,Y-S*.3,S*.14,S*.18);
+      x.fillStyle='rgba(255,170,60,'+(.6+.4*Math.sin(t/520+X))+')';x.fillRect(X-S*.07,Y-S*.3,S*.14,S*.18);
       x.strokeStyle='rgba(255,201,74,.35)';x.lineWidth=2;x.beginPath();x.moveTo(X-S*.62,Y-S*.4);x.lineTo(X,Y-S);x.lineTo(X+S*.62,Y-S*.4);x.stroke()};
     let g=x.createLinearGradient(0,0,0,h*.5);g.addColorStop(0,'#0e1518');g.addColorStop(.6,'#8a5418');g.addColorStop(1,'#e0a23a');
     x.fillStyle=g;x.fillRect(0,0,w,h);
