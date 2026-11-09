@@ -54,3 +54,5 @@ body.gold .win{background:rgba(14,9,3,.88)}
 .oldw.map{padding:0;background:none;clip-path:none;box-shadow:0 8px 24px #000a}
 .oldw.map::after{display:none}
 .oldw.map .old{filter:none;max-height:60vh}
+.hot,.hot.r,.hot.b{border:0;animation:none;box-shadow:none;background:transparent;-webkit-tap-highlight-color:transparent}
+.hot:hover,.hot:focus{box-shadow:none;outline:0}

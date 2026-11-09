@@ -41,8 +41,9 @@ async function check(code,bs,row,vals){
   if(h===null){say('> ACCESS DENIED');row.classList.add('bad');setTimeout(()=>{row.classList.remove('bad');vals.fill('');bs.forEach(b=>b.value='');bs[0].focus()},700);return}
   document.querySelector('main').innerHTML=h;
 }
+const DEV=true; // DEV: set to false before launch (hides the SKIP button and the ?skip shortcut)
 function snake(){
-  if(location.search.includes('skip')){video();return} // DEV SKIP: remove before launch
+  if(DEV&&location.search.includes('skip')){video();return}
   document.querySelector('main').innerHTML='<div class="win" id="w"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SNAKE.EXE</div><div class="body"><div>SCORE <b id="s">0</b></div><canvas id="c" width="400" height="240"></canvas><p class="line" id="m">ARROWS OR SWIPE TO START / EAT THE SIGNAL</p></div></div>';
   const $=id=>document.getElementById(id),c=$('c'),g=c.getContext('2d'),N=20,W=20,H=12,init=()=>[[5,6],[4,6],[3,6]];
   let sn=init(),dir=[1,0],nd=dir,f=[12,6],sc=0,run=1,go=0;
@@ -67,6 +68,7 @@ function snake(){
   let t0;c.addEventListener('touchstart',e=>{t0=e.touches[0]},{passive:true});
   c.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-t0.clientX,dy=t.clientY-t0.clientY;turn(Math.abs(dx)>Math.abs(dy)?[Math.sign(dx),0]:[0,Math.sign(dy)])});
   put();draw();setInterval(tick,110);
+  if(DEV){const b=document.createElement('button');b.className='nxt';b.textContent='SKIP (DEV)';b.onclick=()=>{run=0;video()};document.querySelector('main').appendChild(b)}
 }
 function glitchOut(done){
   const w=document.getElementById('w'),m=document.getElementById('m'),b=document.body,junk='#%&*<>01XZ@$';let n=0;
