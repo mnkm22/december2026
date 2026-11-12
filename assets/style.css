@@ -56,3 +56,5 @@ body.gold .win{background:rgba(14,9,3,.88)}
 .oldw.map .old{filter:none;max-height:60vh}
 .hot,.hot.r,.hot.b{border:0;animation:none;box-shadow:none;background:transparent;-webkit-tap-highlight-color:transparent}
 .hot:hover,.hot:focus{box-shadow:none;outline:0}
+.navb{display:flex;justify-content:space-between;gap:1rem;margin-top:1rem}.navb .nxt{margin-top:0}
+.oldw.map{width:100%;cursor:zoom-in}.oldw.map .old{width:100%;max-height:none;height:auto}

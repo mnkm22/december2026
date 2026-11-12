@@ -96,6 +96,8 @@ function swirl(done){
 function video(){
   document.querySelector('main').innerHTML='<div class="win vid"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SIGNAL</div><div class="body"><video id="v" controls playsinline preload="metadata" src="assets/video.mp4"></video><p class="line" id="vm">> SEVEN FLECKS CARRY A MESSAGE. ENTER WHAT YOU FOUND.</p><div class="row"><span>></span><input id="ans" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ENTER WORD"></div></div></div>';
   const v=document.getElementById('v'),a=document.getElementById('ans');
+  if(window.ruinsHTML){const b=document.createElement('button');b.className='nxt';b.textContent='RETURN TO RUINS >';b.onclick=()=>{snd.duck(0);document.querySelector('main').innerHTML=window.ruinsHTML};document.querySelector('.vid .body').appendChild(b)}
+  v.onerror=()=>{document.getElementById('vm').textContent='> SIGNAL LOST. VIDEO COULD NOT LOAD (ERROR '+(v.error?v.error.code:'?')+'). 4 MEANS FILE MISSING OR UNSUPPORTED FORMAT.'};
   a.addEventListener('input',()=>{a.value=a.value.toUpperCase()});
   v.onplay=()=>snd.duck(1);v.onpause=v.onended=()=>snd.duck(0);
   a.addEventListener('keydown',async e=>{if(e.key!=='Enter')return;const w=a.value.trim();a.value='';
@@ -104,13 +106,25 @@ function video(){
 }
 function portal(h){
   const m=document.querySelector('main');
-  m.innerHTML='<div class="portal"><div class="ring" id="rg"></div><p class="line">> A DOOR HAS OPENED BETWEEN TWO WORLDS. STEP THROUGH.</p></div>';
+  m.innerHTML='<div class="portal"><div class="ring" id="rg"></div><p class="line">> A DOOR HAS OPENED BETWEEN TWO WORLDS. STEP THROUGH.</p><button class="nxt" onclick="video()">&lt; BACK TO VIDEO</button></div>';
   const rg=document.getElementById('rg');
   rg.onclick=()=>{rg.onclick=null;rg.classList.add('go');snd.sweep(2);
     setTimeout(()=>{const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:30;background:#ffc94a;transition:opacity 1.2s';document.body.appendChild(o);
-      document.body.classList.add('gold');startRuins();m.innerHTML=h;
+      document.body.classList.add('gold');startRuins();window.ruinsHTML=h;m.innerHTML=h;
       requestAnimationFrame(()=>requestAnimationFrame(()=>o.style.opacity=0));setTimeout(()=>o.remove(),1400)},1700)};
 }
-window.nxt=()=>{const a=document.querySelector('.scr.on'),n=a&&a.nextElementSibling;
-  if(n&&n.classList.contains('scr')){a.classList.remove('on');n.classList.add('on')}else document.querySelector('.nxt').style.display='none'};
+window.go=d=>{const s=[...document.querySelectorAll('.scr')],i=s.findIndex(e=>e.classList.contains('on')),j=i+d;
+  if(j<0){snd.duck(0);video();return}if(j>=s.length)return;
+  s[i].classList.remove('on');s[j].classList.add('on');document.querySelector('.nxt.fwd').style.visibility=j<s.length-1?'visible':'hidden'};
+window.video=video;
+window.nxt=()=>go(1);window.prv=()=>go(-1);
+document.addEventListener('click',e=>{const m=e.target.closest&&e.target.closest('.oldw.map img');if(!m)return;
+  const FX=.500,FY=.409,R=941/1672; // centre of the black cross on the map (fractions of width/height)
+  const o=document.createElement('div'),im=document.createElement('img');let w=innerWidth<700?2600:Math.max(innerWidth*1.5,2800);
+  o.style.cssText='position:fixed;inset:0;z-index:40;background:#000;overflow:auto';
+  im.src=m.src;im.style.cssText='display:block;max-width:none;width:'+w+'px';
+  const zoom=k=>{const cx=(o.scrollLeft+innerWidth/2)/w,cy=(o.scrollTop+innerHeight/2)/(w*R);w=Math.min(5000,Math.max(innerWidth,w*k));im.style.width=w+'px';o.scrollLeft=cx*w-innerWidth/2;o.scrollTop=cy*w*R-innerHeight/2};
+  const btn=(t,l,f)=>{const b=document.createElement('button');b.textContent=t;b.className='nxt';b.style.cssText='position:fixed;z-index:41;bottom:.8rem;left:'+l+';margin:0;background:#000c';b.onclick=ev=>{ev.stopPropagation();f()};return b};
+  o.append(im,btn('-','.8rem',()=>zoom(1/1.4)),btn('+','4rem',()=>zoom(1.4)),btn('CLOSE','7.2rem',()=>o.remove()));
+  document.body.appendChild(o);o.scrollLeft=FX*w-innerWidth/2;o.scrollTop=FY*w*R-innerHeight/2});
 </script></body></html>
