@@ -58,3 +58,10 @@ body.gold .win{background:rgba(14,9,3,.88)}
 .hot:hover,.hot:focus{box-shadow:none;outline:0}
 .navb{display:flex;justify-content:space-between;gap:1rem;margin-top:1rem}.navb .nxt{margin-top:0}
 .oldw.map{width:100%;cursor:zoom-in}.oldw.map .old{width:100%;max-height:none;height:auto}
+#hud{position:fixed;top:.6rem;left:.6rem;z-index:20;font-size:.7rem;letter-spacing:.15em;opacity:.75}
+h1{animation:tg 7s infinite}
+@keyframes tg{0%,90%,100%{text-shadow:0 0 18px var(--g);transform:none}92%{text-shadow:-4px 0 #f0f,4px 0 #0ff,0 0 18px var(--g);transform:translateX(3px) skewX(-6deg)}95%{text-shadow:4px 0 #f0f,-4px 0 #0ff;transform:translateX(-3px)}}
+.tn{font-size:clamp(1.4rem,6vw,2.6rem);letter-spacing:.4em;text-align:center;margin:.9rem 0;text-shadow:0 0 14px var(--g);animation:tnin 1.2s steps(12) both}
+@keyframes tnin{from{opacity:0;filter:blur(6px);letter-spacing:1em}to{opacity:1;filter:none;letter-spacing:.4em}}
+.scan::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:4;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65));animation:fl 4s infinite}
+@keyframes fl{0%,100%{opacity:1}50%{opacity:.92}97%{opacity:.8}}

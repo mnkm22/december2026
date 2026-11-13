@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>WHISPERER</title><link rel="stylesheet" href="assets/style.css"></head>
-<body class="scan"><canvas id="rain"></canvas><button id="snd"></button>
+<body class="scan"><canvas id="rain"></canvas><button id="snd"></button><div id="hud"></div>
 <main><h1>WHISPERER</h1><p class="tag">THE PROPHECY HAS BEGUN</p>
 <div class="win"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://TERMINAL</div>
 <div class="body"><div id="out"></div><div class="row" id="prompt"><span>guest@whisperer:~$</span><input id="in" autocomplete="off" autocapitalize="characters" spellcheck="false" autofocus></div></div></div></main>
@@ -13,16 +13,19 @@ inp.addEventListener('input',()=>{inp.value=inp.value.toUpperCase()});
 const label=()=>sb.textContent='SOUND: '+(snd.isMuted()?'OFF':'ON');label();
 sb.onclick=e=>{e.stopPropagation();snd.start();snd.mute(!snd.isMuted());label()};
 ['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>snd.start(),{once:true}));
-(async()=>{for(const l of ['> INITIALIZING SIGNAL...','> SCANNING FREQUENCIES...','> CONNECTION ESTABLISHED',"> TYPE 'BEGIN' TO CONTINUE"]){say(l);await wait(500)}})();
+(async()=>{for(const l of ['> INITIALIZING SIGNAL...','> SCANNING FREQUENCIES...','> CONNECTION ESTABLISHED',"> TYPE 'BEGIN' TO CONTINUE"]){await type(l);await wait(250)}})();
 document.addEventListener('click',()=>{const b=document.querySelector('.code input');(b||inp).focus()});
 window.pill=c=>{
-  if(c==='red'){snake();return}
+  if(c==='red'){(DEV&&location.search.includes('skip'))?snake():rabbit(snake);return}
   const l=document.createElement('div');l.className='loop';document.body.appendChild(l);
   let n=0;const t=setInterval(()=>{l.textContent+='GO BACK TO SLEEP '.repeat(8);if(++n>150)clearInterval(t)},40);
 };
-inp.addEventListener('keydown',e=>{
+inp.addEventListener('keydown',async e=>{
   if(e.key!=='Enter')return;const v=inp.value.trim();inp.value='';say('guest@whisperer:~$ '+v);
-  if(v.toLowerCase()==='begin'){document.getElementById('prompt').style.display='none';say('> ENTER 6-DIGIT ACCESS CODE');boxes()}
+  if(v.toLowerCase()==='begin'){document.getElementById('prompt').style.display='none';
+    await type('> IDENTITY CHECK REQUIRED...');
+    const d=document.createElement('div');d.className='tn';d.textContent='TEMET NOSCE';out.appendChild(d);await wait(1400);
+    await type('> KNOW THE ONE WHO CALLED YOU HERE.');await type('> ENTER 6-DIGIT ACCESS CODE');boxes()}
   else say('> UNKNOWN COMMAND');
 });
 function boxes(){
@@ -127,4 +130,27 @@ document.addEventListener('click',e=>{const m=e.target.closest&&e.target.closest
   const btn=(t,l,f)=>{const b=document.createElement('button');b.textContent=t;b.className='nxt';b.style.cssText='position:fixed;z-index:41;bottom:.8rem;left:'+l+';margin:0;background:#000c';b.onclick=ev=>{ev.stopPropagation();f()};return b};
   o.append(im,btn('-','.8rem',()=>zoom(1/1.4)),btn('+','4rem',()=>zoom(1.4)),btn('CLOSE','7.2rem',()=>o.remove()));
   document.body.appendChild(o);o.scrollLeft=FX*w-innerWidth/2;o.scrollTop=FY*w*R-innerHeight/2});
+async function type(t,ms=22){const p=document.createElement('p');p.className='line';out.appendChild(p);for(const ch of t){p.textContent+=ch;await wait(ms)}}
+const hud=document.getElementById('hud'),hudTick=()=>{hud.textContent='\u25CF NODE 7F3A  '+new Date().toTimeString().slice(0,8)+'  GUEST'};hudTick();setInterval(hudTick,1000);
+function rabbit(done){
+  const k=document.createElement('canvas');k.width=innerWidth;k.height=innerHeight;
+  k.style.cssText='position:fixed;inset:0;z-index:50;background:#000;opacity:0;transition:opacity .4s';document.body.appendChild(k);
+  requestAnimationFrame(()=>k.style.opacity=1);
+  const x=k.getContext('2d'),u=Math.max(6,Math.round(innerWidth/70)),Y=k.height*.58,T=3000,msg='FOLLOW THE WHITE RABBIT',t0=performance.now();
+  const R=(a,b,w,h)=>x.fillRect(a*u,b*u,w*u,h*u);let ls=-1,ended=0;
+  (function f(now){
+    const t=now-t0,p=Math.min(1,t/T),st=Math.floor(t/130)%2,X=-18*u+(k.width+36*u)*p;
+    x.clearRect(0,0,k.width,k.height);
+    const n=Math.max(0,Math.min(msg.length,Math.floor((t-600)/45))),al=t<2300?1:Math.max(0,1-(t-2300)/500);
+    x.font='bold '+Math.max(16,u*2.4)+'px monospace';x.textAlign='center';x.fillStyle='rgba(55,255,122,'+al+')';
+    x.shadowColor='#37ff7a';x.shadowBlur=14;x.fillText(msg.slice(0,n)+(n<msg.length&&st?'_':''),k.width/2,k.height*.35);x.shadowBlur=0;
+    x.fillStyle='rgba(55,255,122,.45)';for(let i=1;i<16;i++){const tx=X-i*u*1.5;if(tx>0)x.fillRect(tx,Y+u*(5+(i*7%6)),u*.6,u*.6)}
+    x.save();x.translate(X,Y-(st?u:0));x.shadowColor='#fff';x.shadowBlur=u;
+    x.fillStyle='#fff';R(0,4,11,5);R(9,3,5,5);R(10,0,2,4);R(12,0,2,4);R(-2,5,2,2);
+    if(st){R(-1,8,3,2);R(11,8,3,2)}else{R(0,9,3,2);R(9,9,3,2)}
+    x.shadowBlur=0;x.fillStyle='#f9a';R(10,1,1,2);R(12,1,1,2);x.fillStyle='#e33';R(12,4,1,1);x.restore();
+    if(st!==ls){ls=st;snd.noise()}
+    if(t<T+300)requestAnimationFrame(f);else if(!ended){ended=1;done();k.style.opacity=0;setTimeout(()=>k.remove(),450)}
+  })(t0);
+}
 </script></body></html>
