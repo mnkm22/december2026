@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>WHISPERER</title><link rel="stylesheet" href="assets/style.css"></head>
-<body class="scan"><canvas id="rain"></canvas><button id="snd"></button><div id="hud"></div>
+<body class="scan"><canvas id="rain"></canvas><button id="snd"></button>
 <main><h1>WHISPERER</h1><p class="tag">THE PROPHECY HAS BEGUN</p>
 <div class="win"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://TERMINAL</div>
 <div class="body"><div id="out"></div><div class="row" id="prompt"><span>guest@whisperer:~$</span><input id="in" autocomplete="off" autocapitalize="characters" spellcheck="false" autofocus></div></div></div></main>
@@ -99,7 +99,7 @@ function swirl(done){
 function video(){
   document.querySelector('main').innerHTML='<div class="win vid"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SIGNAL</div><div class="body"><video id="v" controls playsinline preload="metadata" src="assets/video.mp4"></video><p class="line" id="vm">> SEVEN FLECKS CARRY A MESSAGE. ENTER WHAT YOU FOUND.</p><div class="row"><span>></span><input id="ans" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ENTER WORD"></div></div></div>';
   const v=document.getElementById('v'),a=document.getElementById('ans');
-  if(window.ruinsHTML){const b=document.createElement('button');b.className='nxt';b.textContent='RETURN TO RUINS >';b.onclick=()=>{snd.duck(0);document.querySelector('main').innerHTML=window.ruinsHTML};document.querySelector('.vid .body').appendChild(b)}
+  if(window.ruinsHTML){const b=document.createElement('button');b.className='nxt';b.textContent='RETURN TO RUINS >';b.onclick=()=>showRuins();document.querySelector('.vid .body').appendChild(b)}
   v.onerror=()=>{document.getElementById('vm').textContent='> SIGNAL LOST. VIDEO COULD NOT LOAD (ERROR '+(v.error?v.error.code:'?')+'). 4 MEANS FILE MISSING OR UNSUPPORTED FORMAT.'};
   a.addEventListener('input',()=>{a.value=a.value.toUpperCase()});
   v.onplay=()=>snd.duck(1);v.onpause=v.onended=()=>snd.duck(0);
@@ -113,13 +113,13 @@ function portal(h){
   const rg=document.getElementById('rg');
   rg.onclick=()=>{rg.onclick=null;rg.classList.add('go');snd.sweep(2);
     setTimeout(()=>{const o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:30;background:#ffc94a;transition:opacity 1.2s';document.body.appendChild(o);
-      document.body.classList.add('gold');startRuins();window.ruinsHTML=h;m.innerHTML=h;
+      document.body.classList.add('gold');startRuins();window.ruinsHTML=h;m.innerHTML=h;mountNav();
       requestAnimationFrame(()=>requestAnimationFrame(()=>o.style.opacity=0));setTimeout(()=>o.remove(),1400)},1700)};
 }
 window.go=d=>{const s=[...document.querySelectorAll('.scr')],i=s.findIndex(e=>e.classList.contains('on')),j=i+d;
-  if(j<0){snd.duck(0);video();return}if(j>=s.length)return;
-  s[i].classList.remove('on');s[j].classList.add('on');document.querySelector('.nxt.fwd').style.visibility=j<s.length-1?'visible':'hidden'};
-window.video=video;
+  if(j<0){snd.duck(0);video();return}if(j>=s.length){scanner();return}
+  s[i].classList.remove('on');s[j].classList.add('on')};
+window.video=video;window.showRuins=showRuins;
 window.nxt=()=>go(1);window.prv=()=>go(-1);
 document.addEventListener('click',e=>{const m=e.target.closest&&e.target.closest('.oldw.map img');if(!m)return;
   const FX=.500,FY=.409,R=941/1672; // centre of the black cross on the map (fractions of width/height)
@@ -131,24 +131,40 @@ document.addEventListener('click',e=>{const m=e.target.closest&&e.target.closest
   o.append(im,btn('-','.8rem',()=>zoom(1/1.4)),btn('+','4rem',()=>zoom(1.4)),btn('CLOSE','7.2rem',()=>o.remove()));
   document.body.appendChild(o);o.scrollLeft=FX*w-innerWidth/2;o.scrollTop=FY*w*R-innerHeight/2});
 async function type(t,ms=22){const p=document.createElement('p');p.className='line';out.appendChild(p);for(const ch of t){p.textContent+=ch;await wait(ms)}}
-const hud=document.getElementById('hud'),hudTick=()=>{hud.textContent='\u25CF NODE 7F3A  '+new Date().toTimeString().slice(0,8)+'  GUEST'};hudTick();setInterval(hudTick,1000);
+function mountNav(){const b=document.querySelector('.win .body');if(!b)return;b.querySelectorAll('.navb,.nxt').forEach(e=>e.remove());
+  const n=document.createElement('div');n.className='navb';n.innerHTML='<button class="nxt back" onclick="prv()">&lt; BACK</button><button class="nxt fwd" onclick="nxt()">CONTINUE &gt;</button>';b.appendChild(n)}
+function showRuins(last){snd.duck(0);if(window.camStream){window.camStream.getTracks().forEach(t=>t.stop());window.camStream=null}
+  document.querySelector('main').innerHTML=window.ruinsHTML;mountNav();
+  if(last){const s=[...document.querySelectorAll('.scr')];s.forEach(e=>e.classList.remove('on'));s[s.length-1].classList.add('on')}}
+const ARROW_DEG=90,CLUE='THE CRYPTEX WAITS ACROSS THE WATER. (TODO: DIRECTION AND LANDMARK)';
+function scanner(){
+  document.querySelector('main').innerHTML='<div class="win" style="width:min(98vw,720px)"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SCAN</div><div class="body"><div class="cam"><video id="cv" autoplay playsinline muted></video><img class="ovl" src="assets/overlay.png" alt="" onerror="this.remove()"><div class="frame"><b></b><b></b><b></b><b></b></div><div class="arw" style="transform:translate(-50%,-50%) rotate('+ARROW_DEG+'deg)">&#10140;</div></div><p class="line" id="cm">> HOLD YOUR PHONE UP TO THE PRIZE BOARD. FIT THE BOARD INSIDE THE FRAME.</p><p class="line">> '+CLUE+'</p><div class="navb"><button class="nxt" onclick="showRuins(1)">&lt; BACK</button></div></div></div>';
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false}).then(s=>{window.camStream=s;document.getElementById('cv').srcObject=s}).catch(()=>{document.getElementById('cm').textContent='> CAMERA BLOCKED. ALLOW CAMERA ACCESS IN YOUR BROWSER, OR HOLD THE BOARD UP TO THE FRAME.'});
+}
+function mkRabbit(fr){
+  const c=document.createElement('canvas');c.width=48;c.height=32;const g=c.getContext('2d');
+  const E=(cx,cy,rx,ry,col,rot)=>{g.fillStyle=col;g.beginPath();g.ellipse(cx,cy,rx,ry,rot||0,0,6.283);g.fill()};
+  E(5,18,3,3,'#fff');E(14,20,7,7,'#fff');E(22,19,11,7,'#fff');E(32,13,6,5,'#fff');E(38,16,3.2,2.6,'#fff');
+  E(29,7,2.2,7,'#fff',-.9);E(33,6,2.2,7,'#fff',-.9);
+  g.globalCompositeOperation='source-atop';g.fillStyle='#c9d4d8';g.beginPath();g.ellipse(22,24,12,3,0,0,6.283);g.fill();g.globalCompositeOperation='source-over';
+  if(fr){E(8,25,7,2.3,'#fff',.15);E(33,25,6,1.8,'#fff',-.15)}else{E(15,27,5,2.4,'#fff');E(27,27,4,2,'#fff')}
+  E(30,8,.9,4.5,'#f6a6b8',-.9);E(34,7,.9,4.5,'#f6a6b8',-.9);E(35,12.5,1.2,1.2,'#d22');E(40.5,15.5,1,1,'#f6a6b8');
+  const d=g.getImageData(0,0,48,32);for(let i=3;i<d.data.length;i+=4)d.data[i]=d.data[i]>110?255:0;g.putImageData(d,0,0);return c}
 function rabbit(done){
   const k=document.createElement('canvas');k.width=innerWidth;k.height=innerHeight;
   k.style.cssText='position:fixed;inset:0;z-index:50;background:#000;opacity:0;transition:opacity .4s';document.body.appendChild(k);
   requestAnimationFrame(()=>k.style.opacity=1);
-  const x=k.getContext('2d'),u=Math.max(6,Math.round(innerWidth/70)),Y=k.height*.58,T=3000,msg='FOLLOW THE WHITE RABBIT',t0=performance.now();
-  const R=(a,b,w,h)=>x.fillRect(a*u,b*u,w*u,h*u);let ls=-1,ended=0;
+  const x=k.getContext('2d'),sc=Math.max(3,Math.round(innerWidth/200)),SP=[mkRabbit(0),mkRabbit(1)],Y=k.height*.62,T=3000,msg='FOLLOW THE WHITE RABBIT',t0=performance.now();
+  let ls=-1,ended=0;
   (function f(now){
-    const t=now-t0,p=Math.min(1,t/T),st=Math.floor(t/130)%2,X=-18*u+(k.width+36*u)*p;
+    const t=now-t0,p=Math.min(1,t/T),st=Math.floor(t/130)%2,X=-50*sc+(k.width+54*sc)*p;
     x.clearRect(0,0,k.width,k.height);
     const n=Math.max(0,Math.min(msg.length,Math.floor((t-600)/45))),al=t<2300?1:Math.max(0,1-(t-2300)/500);
-    x.font='bold '+Math.max(16,u*2.4)+'px monospace';x.textAlign='center';x.fillStyle='rgba(55,255,122,'+al+')';
-    x.shadowColor='#37ff7a';x.shadowBlur=14;x.fillText(msg.slice(0,n)+(n<msg.length&&st?'_':''),k.width/2,k.height*.35);x.shadowBlur=0;
-    x.fillStyle='rgba(55,255,122,.45)';for(let i=1;i<16;i++){const tx=X-i*u*1.5;if(tx>0)x.fillRect(tx,Y+u*(5+(i*7%6)),u*.6,u*.6)}
-    x.save();x.translate(X,Y-(st?u:0));x.shadowColor='#fff';x.shadowBlur=u;
-    x.fillStyle='#fff';R(0,4,11,5);R(9,3,5,5);R(10,0,2,4);R(12,0,2,4);R(-2,5,2,2);
-    if(st){R(-1,8,3,2);R(11,8,3,2)}else{R(0,9,3,2);R(9,9,3,2)}
-    x.shadowBlur=0;x.fillStyle='#f9a';R(10,1,1,2);R(12,1,1,2);x.fillStyle='#e33';R(12,4,1,1);x.restore();
+    x.font='bold '+Math.max(18,Math.min(44,innerWidth/22))+'px monospace';x.textAlign='center';x.fillStyle='rgba(55,255,122,'+al+')';
+    x.shadowColor='#37ff7a';x.shadowBlur=14;x.fillText(msg.slice(0,n)+(n<msg.length&&st?'_':''),k.width/2,k.height*.3);x.shadowBlur=0;
+    x.fillStyle='rgba(55,255,122,.45)';for(let i=1;i<16;i++){const tx=X-i*sc*3;if(tx>0)x.fillRect(tx,Y-sc*(1+(i*7%8)),sc,sc)}
+    x.save();x.imageSmoothingEnabled=false;x.shadowColor='#fff';x.shadowBlur=sc*3;
+    x.drawImage(SP[st],X,Y-32*sc+(st?-2*sc:0),48*sc,32*sc);x.restore();
     if(st!==ls){ls=st;snd.noise()}
     if(t<T+300)requestAnimationFrame(f);else if(!ended){ended=1;done();k.style.opacity=0;setTimeout(()=>k.remove(),450)}
   })(t0);
