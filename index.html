@@ -136,11 +136,19 @@ function mountNav(){const b=document.querySelector('.win .body');if(!b)return;b.
 function showRuins(last){snd.duck(0);if(window.camStream){window.camStream.getTracks().forEach(t=>t.stop());window.camStream=null}
   document.querySelector('main').innerHTML=window.ruinsHTML;mountNav();
   if(last){const s=[...document.querySelectorAll('.scr')];s.forEach(e=>e.classList.remove('on'));s[s.length-1].classList.add('on')}}
-const ARROW_DEG=90,CLUE='THE CRYPTEX WAITS ACROSS THE WATER. (TODO: DIRECTION AND LANDMARK)';
+const REVEAL='LOOKOUT'; // PLACEHOLDER message: replace with the real clue
 function scanner(){
-  document.querySelector('main').innerHTML='<div class="win" style="width:min(98vw,720px)"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SCAN</div><div class="body"><div class="cam"><video id="cv" autoplay playsinline muted></video><img class="ovl" src="assets/overlay.png" alt="" onerror="this.remove()"><div class="frame"><b></b><b></b><b></b><b></b></div><div class="arw" style="transform:translate(-50%,-50%) rotate('+ARROW_DEG+'deg)">&#10140;</div></div><p class="line" id="cm">> HOLD YOUR PHONE UP TO THE PRIZE BOARD. FIT THE BOARD INSIDE THE FRAME.</p><p class="line">> '+CLUE+'</p><div class="navb"><button class="nxt" onclick="showRuins(1)">&lt; BACK</button></div></div></div>';
-  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false}).then(s=>{window.camStream=s;document.getElementById('cv').srcObject=s}).catch(()=>{document.getElementById('cm').textContent='> CAMERA BLOCKED. ALLOW CAMERA ACCESS IN YOUR BROWSER, OR HOLD THE BOARD UP TO THE FRAME.'});
+  document.querySelector('main').innerHTML='<div class="win" style="width:min(98vw,720px)"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SCAN</div><div class="body"><div class="cam"><video id="cv" autoplay playsinline muted></video><img class="ovl" src="assets/overlay.png" alt="" onerror="this.remove()"><div class="frame"><b></b><b></b><b></b><b></b><i class="beam"></i><div id="rv"></div></div></div><p class="line" id="cm">> HOLD YOUR PHONE UP TO THE PRIZE BOARD. FIT THE BOARD INSIDE THE FRAME, THEN SCAN.</p><div class="navb"><button class="nxt" onclick="showRuins(1)">&lt; BACK</button><button class="nxt" id="sc" onclick="doScan()">SCAN</button></div></div></div>';
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false}).then(s=>{window.camStream=s;document.getElementById('cv').srcObject=s}).catch(()=>{});
 }
+window.doScan=async()=>{const b=document.getElementById('sc');if(b.disabled)return;b.disabled=true;
+  const beam=document.querySelector('.frame .beam'),rv=document.getElementById('rv');rv.innerHTML='';
+  beam.style.display='block';beam.style.animation='none';void beam.offsetWidth;beam.style.animation='sweep 1.8s linear forwards';snd.sweep(1.8);
+  await wait(1900);beam.style.display='none';
+  const L=[...REVEAL];
+  for(let i=0;i<L.length;i++){const e=document.createElement('span');e.className='pop';e.textContent=L[i];
+    e.style.left=(i%2?72:28)+'%';e.style.top=(10+i*(80/Math.max(1,L.length-1)))+'%';rv.appendChild(e);snd.ping();await wait(450)}
+  document.getElementById('cm').textContent='> SIGNAL LOCKED: '+REVEAL;b.disabled=false;b.textContent='SCAN AGAIN'};
 function mkRabbit(fr){
   const c=document.createElement('canvas');c.width=48;c.height=32;const g=c.getContext('2d');
   const E=(cx,cy,rx,ry,col,rot)=>{g.fillStyle=col;g.beginPath();g.ellipse(cx,cy,rx,ry,rot||0,0,6.283);g.fill()};

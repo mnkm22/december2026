@@ -73,3 +73,9 @@ h1{animation:tg 7s infinite}
 .frame b:nth-child(3){left:-3px;bottom:-3px;border-right:0;border-top:0}.frame b:nth-child(4){right:-3px;bottom:-3px;border-left:0;border-top:0}
 .arw{position:absolute;left:50%;top:50%;font-size:min(22vw,7rem);color:#ffc94a;text-shadow:0 0 18px #ffc94a,0 0 3px #000;pointer-events:none;animation:ap 1.6s ease-in-out infinite}
 @keyframes ap{50%{opacity:.55}}
+.frame{inset:9.4% 14%}
+.frame .beam{display:none;position:absolute;left:0;right:0;top:0;height:3px;background:#ffc94a;box-shadow:0 0 14px 4px #ffc94a}
+@keyframes sweep{from{top:0}to{top:calc(100% - 3px)}}
+#rv{position:absolute;inset:0;pointer-events:none}
+.pop{position:absolute;transform:translate(-50%,-50%);font-size:min(14vw,3.4rem);font-weight:bold;color:#ffc94a;text-shadow:0 0 14px #ffc94a,0 0 3px #000;animation:pp .45s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes pp{from{transform:translate(-50%,-50%) scale(0);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
