@@ -134,22 +134,26 @@ document.addEventListener('click',e=>{const m=e.target.closest&&e.target.closest
 async function type(t,ms=22){const p=document.createElement('p');p.className='line';out.appendChild(p);for(const ch of t){p.textContent+=ch;await wait(ms)}}
 function mountNav(){const b=document.querySelector('.win .body');if(!b)return;b.querySelectorAll('.navb,.nxt').forEach(e=>e.remove());
   const n=document.createElement('div');n.className='navb';n.innerHTML='<button class="nxt back" onclick="prv()">&lt; BACK</button><button class="nxt fwd" onclick="nxt()">CONTINUE &gt;</button>';b.appendChild(n)}
-function showRuins(last){snd.duck(0);if(window.camStream){window.camStream.getTracks().forEach(t=>t.stop());window.camStream=null}
+function showRuins(last){snd.duck(0);if(window.arScene){try{window.arScene.systems['mindar-image-system'].stop()}catch(e){}window.arScene.remove();window.arScene=null}if(window.camStream){window.camStream.getTracks().forEach(t=>t.stop());window.camStream=null}
   document.querySelector('main').innerHTML=window.ruinsHTML;mountNav();
   if(last){const s=[...document.querySelectorAll('.scr')];s.forEach(e=>e.classList.remove('on'));s[s.length-1].classList.add('on')}}
-const REVEAL='LOOKOUT'; // PLACEHOLDER message: replace with the real clue
-function scanner(){
-  document.querySelector('main').innerHTML='<div class="win" style="width:min(98vw,720px)"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SCAN</div><div class="body"><div class="cam"><video id="cv" autoplay playsinline muted></video><img class="ovl" src="assets/overlay.png" alt="" onerror="this.remove()"><div class="frame"><b></b><b></b><b></b><b></b><i class="beam"></i><div id="rv"></div></div></div><p class="line" id="cm">> HOLD YOUR PHONE UP TO THE PRIZE BOARD. FIT THE BOARD INSIDE THE FRAME, THEN SCAN.</p><div class="navb"><button class="nxt" onclick="showRuins(1)">&lt; BACK</button><button class="nxt" id="sc" onclick="doScan()">SCAN</button></div></div></div>';
-  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false}).then(s=>{window.camStream=s;document.getElementById('cv').srcObject=s}).catch(()=>{});
+const BW=767,BH=1153,R=.0092; // board target size in px; ring radius as a fraction of board width
+const RINGS=[[113.6,873],[143.9,488],[200.8,550],[119,733],[169.6,550],[204.4,425],[152.9,672],[205.8,955]]; // circled letters in order of appearance (board px): W I N D T R E E
+const loadJS=src=>new Promise((ok,no)=>{const e=document.createElement('script');e.src=src;e.onload=ok;e.onerror=no;document.head.appendChild(e)});
+function plainCam(msg){const cam=document.getElementById('cam');cam.innerHTML='<video id="cv" autoplay playsinline muted></video><div class="frame"><b></b><b></b><b></b><b></b></div>';document.getElementById('cm').textContent=msg;
+  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false}).then(s=>{window.camStream=s;document.getElementById('cv').srcObject=s}).catch(()=>{})}
+async function scanner(){
+  document.querySelector('main').innerHTML='<div class="win" style="width:min(98vw,720px)"><div class="bar"><i></i><i></i><i></i>&nbsp;WHISPERER://SCAN</div><div class="body"><div class="cam" id="cam"></div><p class="line" id="cm">> HOLD YOUR PHONE UP TO THE PRIZE BOARD. KEEP THE WHOLE BOARD IN VIEW.</p><div class="navb"><button class="nxt" onclick="showRuins(1)">&lt; BACK</button></div></div></div>';
+  let ok=false;try{ok=(await fetch('assets/targets.mind',{method:'HEAD'})).ok}catch{}
+  if(!ok){plainCam('> SCAN TARGET NOT INSTALLED YET (assets/targets.mind).');return}
+  try{await loadJS('https://aframe.io/releases/1.5.0/aframe.min.js');await loadJS('https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js')}catch{plainCam('> COULD NOT LOAD THE SCANNER. CHECK YOUR CONNECTION.');return}
+  const ring=p=>'<a-ring class="rg" visible="false" position="'+(p[0]/BW-.5).toFixed(4)+' '+((BH/2-p[1])/BW).toFixed(4)+' 0.002" radius-inner="'+(R*.7).toFixed(4)+'" radius-outer="'+R+'" material="shader:flat;color:#ffc94a;opacity:.95;transparent:true;side:double" animation="property:scale;from:0 0 0;to:1 1 1;dur:350;easing:easeOutBack;startEvents:pop"><a-circle radius="'+(R*.7).toFixed(4)+'" material="shader:flat;color:#ffc94a;opacity:.25;transparent:true;side:double"></a-circle></a-ring>';
+  const cam=document.getElementById('cam');
+  cam.innerHTML='<a-scene id="ar" mindar-image="imageTargetSrc:assets/targets.mind;uiLoading:no;uiScanning:no;uiError:no;filterMinCF:0.0001;filterBeta:0.001" color-space="sRGB" renderer="colorManagement:true,physicallyCorrectLights" vr-mode-ui="enabled:false" device-orientation-permission-ui="enabled:false" embedded><a-camera position="0 0 0" look-controls="enabled:false"></a-camera><a-entity id="tg" mindar-image-target="targetIndex:0">'+RINGS.map(ring).join('')+'</a-entity></a-scene>';
+  window.arScene=document.getElementById('ar');const tg=document.getElementById('tg'),cm=document.getElementById('cm');let tm=[];
+  tg.addEventListener('targetFound',()=>{cm.textContent='> SIGNAL FOUND.';tm.forEach(clearTimeout);tm=[...tg.querySelectorAll('.rg')].map((e,i)=>setTimeout(()=>{e.setAttribute('visible',true);e.emit('pop');snd.ping()},600+i*500))});
+  tg.addEventListener('targetLost',()=>{tm.forEach(clearTimeout);tg.querySelectorAll('.rg').forEach(e=>e.setAttribute('visible',false));cm.textContent='> HOLD YOUR PHONE UP TO THE PRIZE BOARD. KEEP THE WHOLE BOARD IN VIEW.'});
 }
-window.doScan=async()=>{const b=document.getElementById('sc');if(b.disabled)return;b.disabled=true;
-  const beam=document.querySelector('.frame .beam'),rv=document.getElementById('rv');rv.innerHTML='';
-  beam.style.display='block';beam.style.animation='none';void beam.offsetWidth;beam.style.animation='sweep 1.8s linear forwards';snd.sweep(1.8);
-  await wait(1900);beam.style.display='none';
-  const L=[...REVEAL];
-  for(let i=0;i<L.length;i++){const e=document.createElement('span');e.className='pop';e.textContent=L[i];
-    e.style.left=(i%2?72:28)+'%';e.style.top=(10+i*(80/Math.max(1,L.length-1)))+'%';rv.appendChild(e);snd.ping();await wait(450)}
-  document.getElementById('cm').textContent='> SIGNAL LOCKED: '+REVEAL;b.disabled=false;b.textContent='SCAN AGAIN'};
 function stall(fn){let ran=0,last=performance.now();
   const run=()=>{if(ran)return;ran=1;clearInterval(iv);fn()},iv=setInterval(()=>{if(!document.hidden&&performance.now()-last>3000)run()},1000);
   document.addEventListener('visibilitychange',()=>{last=performance.now()});return{beat:()=>{last=performance.now()},run}}
