@@ -80,3 +80,6 @@ h1{animation:tg 7s infinite}
 #rv{position:absolute;inset:0;pointer-events:none}
 .pop{position:absolute;transform:translate(-50%,-50%);font-size:min(14vw,3.4rem);font-weight:bold;color:#ffc94a;text-shadow:0 0 14px #ffc94a,0 0 3px #000;animation:pp .45s cubic-bezier(.2,1.6,.4,1) both}
 @keyframes pp{from{transform:translate(-50%,-50%) scale(0);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.cam{isolation:isolate}
+.a-enter-vr,.a-enter-ar,.a-orientation-modal{display:none!important}
+.cam{isolation:isolate;z-index:0}
